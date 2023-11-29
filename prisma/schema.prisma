@@ -11,3 +11,62 @@ datasource db {
 }
 
 
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  username String   @unique
+  password String
+  // Relacionamento com as mensagens enviadas pelo usuário
+  sentMessages Message[]
+  // Relacionamento com os grupos de conversa em que o usuário está
+  groupMembers GroupMember[]
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  timestamp DateTime @default(now())
+  // relacionamentos
+  sender    User     @relation(fields: [senderId], references: [id])
+  senderId  Int
+ 
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   Int
+}
+
+
+
+model Group {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  
+  // relacionamentos
+  messages  Message[]
+members   GroupMember[]
+}
+
+
+model GroupMember {
+  userId  Int
+  groupId Int
+  // relacionamentos
+  user    User @relation(fields: [userId], references: [id])
+
+  group   Group @relation(fields: [groupId], references: [id])
+  
+  @@id([userId, groupId])
+}
+
+
+              // mensagens em tempo real com sockets
+// model SocketConnection {
+//   socketId String  @id
+//   userId   Int
+  
+//   // Relacionamento com o usuário
+//   user     User @relation(fields: [userId], references: [id])
+  
+//   @@id([socketId, userId])
+// }
